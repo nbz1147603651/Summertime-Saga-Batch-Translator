@@ -1,0 +1,11 @@
+{
+  "api_key": "sk-1080594c22af4c8f98d39c23633e4a29",
+  "api_base": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+  "api_model": "qwen-turbo",
+  "lang_code": "zh",
+  "lang_name": "简体中文",
+  "batch_size": 15,
+  "game_dir": "",
+  "extract_dir": "",
+  "renpy_sdk_dir": ""
+}
