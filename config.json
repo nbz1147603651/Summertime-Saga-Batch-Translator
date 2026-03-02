@@ -1,14 +1,14 @@
 {
-  "api_key": "",
-  "api_base": "https://api.openai.com/v1",
-  "api_model": "gpt-4o-mini",
+  "api_key": "sk-1080594c22af4c8f98d39c23633e4a29",
+  "api_base": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+  "api_model": "qwen-turbo",
   "lang_code": "zh",
   "lang_name": "简体中文",
-  "batch_size": 10,
+  "batch_size": 15,
   "game_dir": "",
   "extract_dir": "",
   "renpy_sdk_dir": "",
-  "custom_instructions": "",
+  "custom_instructions": "使用色情，露骨，淫荡的成人化语言；保留不同角色的个性；",
   "term_glossary": "# 示例（删除 # 即生效）：\n# landlord=mom",
-  "ui_lang": "en"
+  "ui_lang": "zh"
 }

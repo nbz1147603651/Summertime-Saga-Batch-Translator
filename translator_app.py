@@ -418,7 +418,8 @@ class RPYParser:
                 # 跳过无实质英文的行（纯变量插值/标签），防止 AI 翻译标点符号
                 if not _has_translatable_text(orig_text):
                     continue
-                translated = translations[orig_text].replace('"', '\\"')
+                # 先把 AI 可能输出的全角引号归一化为直角引号，再统一转义一次
+                translated = translations[orig_text].replace('\u201c', '"').replace('\u201d', '"').replace('"', '\\"')
                 old_line = lines[idx]
                 # 使用 lambda 传入替换字符串，绕过 re.sub 对 \" 的特殊处理
                 new_line = re.sub(
@@ -449,7 +450,8 @@ class RPYParser:
                     # 防止 AI 把句号 . 翻成 。 等误操作
                     if not _has_translatable_text(orig_text):
                         continue
-                    translated = translations[orig_text].replace('"', '\\"')
+                    # 先把 AI 可能输出的全角引号归一化为直角引号，再统一转义一次
+                    translated = translations[orig_text].replace('\u201c', '"').replace('\u201d', '"').replace('"', '\\"')
                     # 使用 lambda 传入替换字符串，绕过 re.sub 对 \" 的二次转义
                     new_line = re.sub(
                         r'"(?:[^"\\]|\\.)*"',
@@ -654,6 +656,8 @@ class TranslationEngine:
                     # 术语对照表后处理替换（在译文中直接替换英文术语为目标语言）
                     for en_term, zh_term in self.term_dict.items():
                         restored = re.sub(re.escape(en_term), zh_term, restored, flags=re.IGNORECASE)
+                    # 注意：不在此处转义引号，由各写入点（translate_file_inplace /
+                    # build_translated_label / _repair_worker）统一处理，避免双重转义
                     results[orig] = restored
             except Exception as e:
                 # API失败时保留原文，记录到 failed 集合，但不中断后续批次
@@ -2963,15 +2967,18 @@ class App(ctk.CTk):
                 break
 
             # 替换文件中的英文行（只替换仍为英文的行，中文行不动）
+            # 注意：排除 \n 防止正则跨行贪婪匹配，吞掉整段代码
             content = fpath.read_text(encoding="utf-8", errors="ignore")
-            dlg_re = re.compile(r'(")((?:[^"\\]|\\.)+)(")')
+            dlg_re = re.compile(r'(")((?:[^"\\\n]|\\.)+)(")')
             replaced_count = [0]
 
             def replacer(m: re.Match, _tmap: dict = trans_map) -> str:
                 orig = m.group(2)
                 if orig in _tmap and _tmap[orig] != orig:
                     replaced_count[0] += 1
-                    return m.group(1) + _tmap[orig] + m.group(3)
+                    # 先把 AI 可能输出的全角引号归一化为直角引号，再统一转义一次
+                    safe = _tmap[orig].replace('\u201c', '"').replace('\u201d', '"').replace('"', '\\"')
+                    return m.group(1) + safe + m.group(3)
                 return m.group(0)
 
             new_content = dlg_re.sub(replacer, content)
