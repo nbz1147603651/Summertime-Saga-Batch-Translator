@@ -263,6 +263,38 @@ class BackupManager:
 # RPY 解析模块
 # ---------------------------------------------------------------------------
 
+def _has_translatable_text(text: str) -> bool:
+    """判断对话文本是否含有足够的英文字符，值得发往 AI 翻译。
+
+    对于纯变量插值（如 ``\"[saga.cast.roxxy]\".``）直接返回 False，
+    避免将这类行发给 AI，防止 AI 把句号 ``.`` 翻译成 ``。`` 等错误。
+    """
+    # 逐字符去除任意嵌套的 [...] 变量插值
+    stripped: list[str] = []
+    depth = 0
+    i = 0
+    while i < len(text):
+        ch = text[i]
+        if ch == '[':
+            depth += 1
+        elif ch == ']':
+            if depth > 0:
+                depth -= 1
+                i += 1
+                continue
+        elif depth == 0:
+            stripped.append(ch)
+        i += 1
+    clean = ''.join(stripped)
+    # 去除 Ren'Py 富文本标签 {tag}
+    clean = re.sub(r'\{[^{}]*\}', '', clean)
+    # 去除 \n、\"、\' 等转义序列
+    clean = re.sub(r'\\[\S]', '', clean)
+    # 至少有 2 个 ASCII 字母才认为含有可翻译英文
+    latin = sum(1 for c in clean if c.isalpha() and c.isascii())
+    return latin >= 2
+
+
 class Label:
     """表示一个 Ren'Py 标签（对话标签）"""
     __slots__ = ("name", "raw_lines", "dialogues")
@@ -383,12 +415,15 @@ class RPYParser:
         # 替换对话文本
         for idx, char, orig_text in label.dialogues:
             if orig_text in translations:
+                # 跳过无实质英文的行（纯变量插值/标签），防止 AI 翻译标点符号
+                if not _has_translatable_text(orig_text):
+                    continue
                 translated = translations[orig_text].replace('"', '\\"')
                 old_line = lines[idx]
-                # 保留缩进和角色名，替换文本
+                # 使用 lambda 传入替换字符串，绕过 re.sub 对 \" 的特殊处理
                 new_line = re.sub(
                     r'"(?:[^"\\]|\\.)*"',
-                    f'"{translated}"',
+                    lambda _, t=translated: f'"{t}"',
                     old_line,
                     count=1
                 )
@@ -410,10 +445,15 @@ class RPYParser:
             if m:
                 orig_text = m.group(3)
                 if orig_text in translations and translations[orig_text] != orig_text:
+                    # 跳过无实质英文的行（纯变量插值如 \"[saga.cast.xxx]\".）
+                    # 防止 AI 把句号 . 翻成 。 等误操作
+                    if not _has_translatable_text(orig_text):
+                        continue
                     translated = translations[orig_text].replace('"', '\\"')
+                    # 使用 lambda 传入替换字符串，绕过 re.sub 对 \" 的二次转义
                     new_line = re.sub(
                         r'"(?:[^"\\]|\\.)*"',
-                        f'"{ translated}"',
+                        lambda _, t=translated: f'"{t}"',
                         line,
                         count=1,
                     )
@@ -511,10 +551,19 @@ class TranslationEngine:
                     result.append(ch)
                     i += 1
 
-            elif ch == '\\' and i + 1 < len(text) and text[i + 1] == 'n':
-                # 保护 \n 换行转义，防止 AI 删除或翻译
-                result.append(make_token('\\n'))
-                i += 2
+            elif ch == '\\' and i + 1 < len(text):
+                next_ch = text[i + 1]
+                if next_ch == 'n':
+                    # 保护 \n 换行转义，防止 AI 删除或翻译
+                    result.append(make_token('\\n'))
+                    i += 2
+                elif next_ch in ('"', "'", '\\'):
+                    # 保护 \"  \'  \\  转义序列，AI 不应修改这些字符
+                    result.append(make_token(text[i:i + 2]))
+                    i += 2
+                else:
+                    result.append(ch)
+                    i += 1
 
             else:
                 result.append(ch)
@@ -2633,8 +2682,11 @@ class App(ctk.CTk):
                                  f"  ❌ 备份失败: {e}，跳过该文件以防数据丢失")
                 continue
 
-            # ── 收集本文件所有对话文本（去重）──────────────────────────────────
-            texts = list({t for l in labels for _, _, t in l.dialogues})
+            # ── 收集本文件所有对话文本（去重，跳过纯变量/标签行）──────────────
+            # 过滤掉无实质英文的行（如 "\"[saga.cast.xxx]\"." 等），
+            # 这类行不该发给 AI，否则 AI 会把句号 . 翻译成 。 等
+            texts = list({t for l in labels for _, _, t in l.dialogues
+                          if _has_translatable_text(t)})
             translated_map: dict[str, str] = {}
 
             # ── 分批翻译 ──────────────────────────────────────────────────────
