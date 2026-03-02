@@ -72,7 +72,7 @@
    * The log shows progress
    * After completion, it will display the number of extracted files
 
-> ⚠️ **Important**: You need to extract source code files (`.rpy`). If you only have `.rpyc`, please refer to [Understanding Compiled Builds.md]
+> ⚠️ **重要**：需要解压出源代码文件（`.rpy`），如果只有 `.rpyc`，请参考 [理解编译版本.md](理解编译版本.md)
 
 ---
 
@@ -209,18 +209,18 @@ game/scripts/translation/
 
 ---
 
-## 💾 Integrating Translation Files into the Game
+## 💾 将翻译文件集成到游戏
 
 ### Option A: Put Them Directly into the Game Directory (Recommended)
 
-1. Verify the output path: `game/scripts/translation/`
-2. Copy the entire `translation/` folder into the game's `game/scripts/` directory
-3. **Restart the game** ✓
-4. The game will automatically load translation files (because `set_language.rpy` sets `Game.language`)
+1. 核对输出路径：`game/scripts/translation/`
+2. 将整个 `translation/` 文件夹复制到游戏的 `game/scripts/` 目录
+3. **重启游戏** ✓
+4. 游戏会自动加载翻译文件（因为 `set_language.rpy` 会设置 `Game.language`）
 
-### Option B: Create a Mod via the Ren'Py Modding API
+### 方式 B：通过 Ren'Py Modding API 创建 Mod
 
-Refer to **"Option B"** in [Understanding Compiled Builds.md](理解编译版本.md).
+参考 [理解编译版本.md](理解编译版本.md) 中的"方案 B"。
 
 ---
 
@@ -333,21 +333,25 @@ This tool is built with Python and related open-source libraries.
 * **openai** - MIT
 * **requests** - Apache 2.0
 
-Game translation must respect the original license and copyright of the game.
+游戏翻译需尊重游戏的原始许可证和版权。
 
 ---
 
-## 🤝 Feedback & Improvements
+## 🤝 反馈 & 改进
 
-If you have suggestions or find a bug, feel free to reach out:
+如有建议或发现 Bug，欢迎反馈：
 
-* 📧 Email: [[support@example.com](mailto:support@example.com)]
-* 🐙 GitHub Issues: [link]
-* 💬 Discord: [link]
+- 📧 Email：[support@example.com]
+- 🐙 GitHub Issues：[link]
+- 💬 Discord：[link]
 
 ---
 
 **Happy translating!** 🎮✨
 
 **Version 1.0** | Last Updated: 2026-03-01
-
+#   S u m m e r t i m e - S a g a - B a t c h - T r a n s l a t o r 
+ 
+ #   S u m m e r t i m e - S a g a - B a t c h - T r a n s l a t o r 
+ 
+ 
