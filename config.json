@@ -1,6 +1,6 @@
 {
-  "api_key": "sk-1080594c22af4c8f98d39c23633e4a29",
-  "api_base": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+  "api_key": "",
+  "api_base": "",
   "api_model": "qwen-turbo",
   "lang_code": "zh",
   "lang_name": "简体中文",
@@ -8,7 +8,7 @@
   "game_dir": "",
   "extract_dir": "",
   "renpy_sdk_dir": "",
-  "custom_instructions": "使用色情，露骨，淫荡的成人化语言；保留不同角色的个性；",
+  "custom_instructions": "",
   "term_glossary": "# 示例（删除 # 即生效）：\n# landlord=mom",
   "ui_lang": "zh"
 }
