@@ -72,7 +72,7 @@
    * The log shows progress
    * After completion, it will display the number of extracted files
 
-> ⚠️ **重要**：需要解压出源代码文件（`.rpy`），如果只有 `.rpyc`，请参考 [理解编译版本.md](理解编译版本.md)
+> ⚠️ **Important**: You need to extract source code files (`.rpy`). If you only have `.rpyc`, please refer to [Understanding Compiled Builds.md]
 
 ---
 
@@ -209,18 +209,91 @@ game/scripts/translation/
 
 ---
 
-## 💾 将翻译文件集成到游戏
+## 💾 Integrating Translation Files into the Game
 
 ### Option A: Put Them Directly into the Game Directory (Recommended)
 
-1. 核对输出路径：`game/scripts/translation/`
-2. 将整个 `translation/` 文件夹复制到游戏的 `game/scripts/` 目录
-3. **重启游戏** ✓
-4. 游戏会自动加载翻译文件（因为 `set_language.rpy` 会设置 `Game.language`）
+1. Verify the output path: `game/scripts/translation/`
+2. Copy the entire `translation/` folder into the game's `game/scripts/` directory
+3. **Restart the game** ✓
+4. The game will automatically load translation files (because `set_language.rpy` sets `Game.language`)
 
-### 方式 B：通过 Ren'Py Modding API 创建 Mod
+### Option B: Create a Mod via the Ren'Py Modding API
 
-参考 [理解编译版本.md](理解编译版本.md) 中的"方案 B"。
+Refer to **"Option B"** in [Understanding Compiled Builds.md](理解编译版本.md).
+
+---
+
+## 🔤 Font Configuration (⚠️ IMPORTANT)
+
+After translation is complete, you **must** configure the game fonts to properly display Chinese characters. Without this step, the translated text will display incorrectly or fail to render.
+
+### Font Setup Location
+
+The game font mapping is configured in **`game/src/+config.rpy`** (lines 34-43):
+
+```python
+# Chinese Font Replacement: Map Ren'Py default DejaVuSans to SourceHanSans SC
+# (font_name, bold, italic) → (replacement_font, bold, italic)
+config.font_replacement_map['DejaVuSans.ttf', False, False] = (
+    'font/SourceHanSansSC-Regular.otf', False, False)   # Normal weight
+config.font_replacement_map['DejaVuSans.ttf', True, False] = (
+    'font/SourceHanSansSC-Bold.otf', False, False)      # Bold
+config.font_replacement_map['DejaVuSans.ttf', False, True] = (
+    'font/SourceHanSansSC-Normal.otf', False, False)    # Italic → Normal (no italics in Chinese)
+config.font_replacement_map['DejaVuSans.ttf', True, True] = (
+    'font/SourceHanSansSC-Bold.otf', False, False)      # Bold+Italic → Bold
+```
+
+### Available Font Files
+
+The game includes the following SourceHanSans SC fonts in `game/font/`:
+
+- **SourceHanSansSC-Regular.otf** — Normal weight (常规)
+- **SourceHanSansSC-Bold.otf** — Bold weight (粗体)
+- **SourceHanSansSC-Normal.otf** — Normal weight variant (标准)
+- **SourceHanSansSC-Light.otf** — Light weight (细体)
+- **SourceHanSansSC-Medium.otf** — Medium weight (中等)
+- **SourceHanSansSC-Heavy.otf** — Heavy weight (特粗)
+- **SourceHanSansSC-ExtraLight.otf** — Extra light weight (极细)
+
+### How to Apply Font Changes
+
+**Method 1: Edit `+config.rpy` directly (Recommended)**
+
+1. Open `game/src/+config.rpy` in a text editor
+2. Modify the `config.font_replacement_map` entries to use your preferred fonts
+3. Save the file
+4. Restart the game
+
+**Example: Using SourceHanSansSC-Bold for all text**
+
+```python
+config.font_replacement_map['DejaVuSans.ttf', False, False] = (
+    'font/SourceHanSansSC-Bold.otf', False, False)   # Change this line
+config.font_replacement_map['DejaVuSans.ttf', True, False] = (
+    'font/SourceHanSansSC-Bold.otf', False, False)
+```
+
+**Method 2: Create a font override in your translation mod**
+
+If you want to keep the original `+config.rpy` unchanged, add font configuration to your translation files or a separate `.rpy` file in `game/scripts/translation/`:
+
+```python
+# game/scripts/translation/font_config.rpy
+init python:
+    config.font_replacement_map['DejaVuSans.ttf', False, False] = (
+        'font/SourceHanSansSC-Regular.otf', False, False)
+```
+
+### Verification
+
+After applying font changes:
+
+1. ✅ Launch the game
+2. ✅ Check if Chinese dialogue displays correctly
+3. ✅ Check if bold/italic text styles appear as expected
+4. ⚠️ If text looks garbled or displays in boxes, verify the font file paths in `+config.rpy`
 
 ---
 
@@ -292,6 +365,31 @@ A:
 2. **Or** rescan and retranslate (this will overwrite old files)
 3. Restart the game to load the new translations
 
+### Q: Why does Chinese text look like boxes or display incorrectly?
+
+A: **This is usually a font configuration issue.** Follow these steps:
+
+1. **Verify fonts are present**: Check that `game/font/` contains `SourceHanSansSC-*.otf` files
+2. **Check font paths**: Open `game/src/+config.rpy` and verify the font paths match the actual file names
+3. **Reload game**: Restart the game after making any font configuration changes
+4. **Try different fonts**: If the issue persists, try changing to `SourceHanSansSC-Bold.otf` or `SourceHanSansSC-Light.otf`
+5. **Check file location**: Ensure `+config.rpy` is in `game/src/` with the correct capitalization
+
+See [Font Configuration](#font-configuration-important) for detailed instructions.
+
+### Q: Can I use different fonts for dialogue vs UI text?
+
+A: Yes! Ren'Py supports multiple font replacement mappings. You can configure different fonts for normal, bold, and italic text using `config.font_replacement_map`. Edit `+config.rpy` to map different styles to different fonts:
+
+```python
+# Use Light font for normal text
+config.font_replacement_map['DejaVuSans.ttf', False, False] = (
+    'font/SourceHanSansSC-Light.otf', False, False)
+# Use Bold font for emphasized text  
+config.font_replacement_map['DejaVuSans.ttf', True, False] = (
+    'font/SourceHanSansSC-Bold.otf', False, False)
+```
+
 ---
 
 ## 🐛 Troubleshooting
@@ -303,6 +401,8 @@ A:
 | API connection failed          | Invalid API Key             | Check Key, Base URL, and network                       |
 | No response during translation | API timeout                 | Reduce batch size; switch API                          |
 | Game cannot load translation   | Incorrect file path         | Ensure files are in `game/scripts/translation/`        |
+| Chinese text appears as boxes  | Font not configured         | ⚠️ See [Font Configuration](#font-configuration-important) section |
+| Chinese text displays garbled  | Incorrect font file path    | Verify font files exist in `game/font/` and paths in `+config.rpy` are correct |
 
 ---
 
@@ -333,25 +433,22 @@ This tool is built with Python and related open-source libraries.
 * **openai** - MIT
 * **requests** - Apache 2.0
 
-游戏翻译需尊重游戏的原始许可证和版权。
+Game translation must respect the original license and copyright of the game.
 
 ---
 
-## 🤝 反馈 & 改进
+## 🤝 Feedback & Improvements
 
-如有建议或发现 Bug，欢迎反馈：
+If you have suggestions or find a bug, feel free to reach out:
 
-- 📧 Email：[support@example.com]
-- 🐙 GitHub Issues：[link]
-- 💬 Discord：[link]
+* 📧 Email: [[support@example.com](mailto:support@example.com)]
+* 🐙 GitHub Issues: [link]
+* 💬 Discord: [link]
 
 ---
 
 **Happy translating!** 🎮✨
 
 **Version 1.0** | Last Updated: 2026-03-01
-#   S u m m e r t i m e - S a g a - B a t c h - T r a n s l a t o r 
- 
- #   S u m m e r t i m e - S a g a - B a t c h - T r a n s l a t o r 
- 
- 
+
+
