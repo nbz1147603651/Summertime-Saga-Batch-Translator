@@ -1,38 +1,42 @@
-# 🎮 STS 翻译工具 v1.0
+# STS 翻译工具 v1.0
 
-**Summertime Saga 批量翻译工具** — 基于 Ren'Py Modding API，通过大语言模型实现游戏对话全自动汉化。
+**Summertime Saga 批量翻译工具** — 通过大语言模型（LLM）对游戏对话进行全自动汉化，直接修改 `.rpy` 源文件，无需依赖废弃的 `Game.language` API，兼容 v21.0.0 新架构。
 
 ---
 
-## 🚀 快速开始
+## 功能概览
 
-### 安装
+| 功能模块 | 说明 |
+|---|---|
+| 📦 解压存档 | 支持 RPA v2 / v3 格式，将 `.rpa` 存档解压为可编辑的源文件 |
+| 🔍 扫描文本 | 递归扫描目录中的 `.rpy` 文件，自动提取含对话的标签 |
+| ⚙️ API 设置 | 兼容 OpenAI / DeepSeek / Ollama 等所有兼容接口 |
+| 🚀 批量翻译 | 多线程翻译，支持暂停/继续/停止，自动备份原始文件 |
+| 🔄 补翻修复 | 扫描已翻译文件中残留的英文对话，二次补翻 |
+| 🛡️ 备份恢复 | 查看备份状态，一键还原所有原始文件 |
 
-1. **进入 translator 文件夹**
+---
+
+## 快速开始
+
+### 方式 A：直接运行（需要 Python）
+
+1. 确保已安装 **Python 3.8+**（[下载](https://www.python.org/downloads/)）
+2. 进入 `translator/` 目录，直接运行主程序：
    ```bash
-   cd translator/
+   python translator_app.py
    ```
+   首次运行会自动安装所需依赖（`customtkinter`、`openai`、`requests`），约 1-2 分钟。
 
-2. **运行启动脚本**（三选一）
+### 方式 B：打包为独立 .exe（推荐分发给他人）
 
-   **Windows（最简单）**
-   ```bash
-   双击 run_translator.bat
+1. 确保已安装 **Python 3.8+**
+2. 双击 **`build.bat`** 或在命令行运行：
+   ```bat
+   build.bat
    ```
-
-   **PowerShell**
-   ```powershell
-   .\run_translator.ps1
-   ```
-
-   **创建桌面快捷方式**
-   ```powershell
-   .\create_shortcut.ps1
-   ```
-
-3. **等待依赖安装**
-   - 首次运行会自动安装 `customtkinter`、`openai`、`requests`
-   - 大约 1-2 分钟
+3. 等待 2-5 分钟，打包完成后输出到 `dist\STS翻译工具\`
+4. 将整个 `dist\STS翻译工具\` 文件夹分发给他人，双击 `STS翻译工具.exe` 即可运行（无需安装 Python）
 
 ---
 
@@ -312,3 +316,5 @@ A:
 **祝你翻译顺利！** 🎮✨
 
 **Version 1.0** | Last Updated: 2026-03-01
+#   S u m m e r t i m e - S a g a - B a t c h - T r a n s l a t o r  
+ 
