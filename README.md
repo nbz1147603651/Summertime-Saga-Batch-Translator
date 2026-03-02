@@ -72,7 +72,7 @@
    * The log shows progress
    * After completion, it will display the number of extracted files
 
-> ⚠️ **Important**: You need to extract source code files (`.rpy`). If you only have `.rpyc`, please refer to [Understanding Compiled Builds.md](理解编译版本.md)
+> ⚠️ **Important**: You need to extract source code files (`.rpy`). If you only have `.rpyc`, please refer to [Understanding Compiled Builds.md]
 
 ---
 
@@ -350,3 +350,4 @@ If you have suggestions or find a bug, feel free to reach out:
 **Happy translating!** 🎮✨
 
 **Version 1.0** | Last Updated: 2026-03-01
+
