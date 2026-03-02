@@ -1,0 +1,20 @@
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+
+# 运行日志（保留目录）
+logs/*.log
+
+# 配置文件（含 API Key，不应提交）
+config.json
+
+# 调试 / 临时输出
+check_result*.txt
+*.tmp
+
+# 编辑器/系统文件
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
